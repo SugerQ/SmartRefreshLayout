@@ -1,9 +1,3 @@
-/**
- * @file XListViewHeader.java
- * @create Apr 18, 2012 5:22:27 PM
- * @author Maxwin
- * @description XListView's header
- */
 package com.scwang.smartrefresh.header;
 
 import android.animation.Animator;
@@ -36,7 +30,7 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 /**
  * WaterDropHeader
- * Created by SCWANG on 2017/5/31.
+ * Created by scwang on 2017/5/31.
  * from https://github.com/THEONE10211024/WaterDropListView
  */
 public class WaterDropHeader extends InternalAbstract implements RefreshHeader {
@@ -61,7 +55,12 @@ public class WaterDropHeader extends InternalAbstract implements RefreshHeader {
 
         final ViewGroup thisGroup = this;
 
-        mSpinnerStyle = SpinnerStyle.Scale;
+        for (SpinnerStyle style : SpinnerStyle.values) {
+            if (style.scale) {
+                mSpinnerStyle = style;
+                break;
+            }
+        }
         mWaterDropView = new WaterDropView(context);
         mWaterDropView.updateCompleteState(0);
         thisGroup.addView(mWaterDropView, MATCH_PARENT, MATCH_PARENT);
@@ -73,7 +72,7 @@ public class WaterDropHeader extends InternalAbstract implements RefreshHeader {
 
         mImageView = new ImageView(context);
         mProgress = new MaterialProgressDrawable(mImageView);
-        mProgress.setBackgroundColor(0xffffffff);
+//        mProgress.setBackgroundColor(0xffffffff);
         mProgress.setAlpha(255);
         mProgress.setColorSchemeColors(0xffffffff,0xff0099cc,0xffff4444,0xff669900,0xffaa66cc,0xffff8800);
         mImageView.setImageDrawable(mProgress);
@@ -153,12 +152,9 @@ public class WaterDropHeader extends InternalAbstract implements RefreshHeader {
 //            super.invalidateDrawable(drawable);
 //        }
     }
-
     //</editor-fold>
 
     //<editor-fold desc="RefreshHeader">
-
-
     @Override
     public void onMoving(boolean isDragging, float percent, int offset, int height, int maxDragHeight) {
         if (isDragging || (mState != RefreshState.Refreshing && mState != RefreshState.RefreshReleased)) {

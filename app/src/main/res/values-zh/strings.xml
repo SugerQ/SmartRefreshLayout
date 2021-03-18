@@ -45,6 +45,7 @@
     <string name="title_activity_example_listener">多功能监听器</string>
     <string name="title_activity_example_custom">自定义Header</string>
     <string name="title_activity_example_snap_helper">SnapHelper</string>
+    <string name="title_activity_example_i18n">国际化</string>
 
     <string name="fragment_example_no_more_data">没有更多数据</string>
     <string name="fragment_example_horizontal">水平滚动模式</string>
@@ -59,6 +60,8 @@
     <string name="fragment_example_three_level">三级刷新</string>
     <string name="fragment_example_bottom_sheet">Bottom Sheet 对话框</string>
     <string name="fragment_example_flex_box_layout">Flexbox Layout 管理器</string>
+    <string name="fragment_example_disallow_intercept">禁止拦截</string>
+    <string name="fragment_example_staggered_grid">瀑布流</string>
 
     <string name="fragment_practice_instant">即时通讯</string>
 
@@ -71,12 +74,15 @@
     <string name="index_example_scroll">纯滚动模式</string>
     <string name="index_example_listener">多功能监听器</string>
     <string name="index_example_custom">自定义Header</string>
+    <string name="index_example_i18n">国际化支持</string>
     <string name="index_example_snap_helper">结合 SnapHelper 使用</string>
     <string name="index_example_pager">ViewPager 多页面共用一个 RefreshLayout</string>
     <string name="index_example_bottom_sheet">BottomSheet内部使用加载更多</string>
     <string name="index_example_level">三级刷新</string>
-    <string name="index_example_flexbox">结合 FlexboxLayoutManager 使用</string>
+    <string name="index_example_flex_box">结合 FlexboxLayoutManager 使用</string>
     <string name="index_example_horizontal">水平滚动刷新</string>
+    <string name="index_example_disallow_intercept">requestDisallowInterceptTouchEvent 的使用</string>
+    <string name="index_example_staggered_grid">StaggeredGridLayoutManager 的使用</string>
 
     <string name="index_practice_repast">餐饮美食-简单自定义Header-外边距magin</string>
     <string name="index_practice_profile">个人中心-PureScrollMode-纯滚动模式</string>
@@ -116,6 +122,11 @@
     <string name="item_example_number_abstract">这是测试的第%02d条数据</string>
     <string name="item_example_pager_left">左边</string>
     <string name="item_example_pager_right">右边</string>
+
+    <string name="item_example_i18n_system">跟随系统</string>
+    <string name="item_example_i18n_chinese">中文</string>
+    <string name="item_example_i18n_english">英语</string>
+    <string name="item_example_i18n_click">点击切换语言为 %s</string>
 
     <string name="github_qq_browser_kernel">网页由 github.com 提供\n已启用QQ浏览器X5内核</string>
 
@@ -172,5 +183,6 @@
 
     <string name="instant_message_input_hint">输入消息</string>
     <string name="instant_message_send">发送</string>
+    <string name="switch_scroll_content_when_loaded">加载更多时显示新内容</string>
 
 </resources>

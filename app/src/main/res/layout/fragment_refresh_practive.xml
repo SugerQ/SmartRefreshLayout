@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.scwang.refreshlayout.fragment.index.RefreshStylesFragment">
+    tools:context="com.scwang.refreshlayout.fragment.index.RefreshPracticeFragment">
 
     <android.support.v7.widget.Toolbar style="@style/AppTheme.Toolbar"
         android:id="@id/toolbar"
@@ -30,9 +30,12 @@
             android:background="@android:color/white"
             android:overScrollMode="never"
             tools:listitem="@android:layout/simple_list_item_2"/>
-        <com.scwang.smartrefresh.header.MaterialHeader
+        <com.scwang.smartrefresh.layout.footer.FalsifyFooter
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+<!--        <com.scwang.smartrefresh.header.MaterialHeader-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"/>-->
     </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
 </LinearLayout>

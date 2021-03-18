@@ -45,6 +45,7 @@
     <string name="title_activity_example_listener">Multifunction monitor</string>
     <string name="title_activity_example_custom">Custom Header</string>
     <string name="title_activity_example_snap_helper">SnapHelper</string>
+    <string name="title_activity_example_i18n">I18N</string>
 
     <string name="fragment_example_no_more_data">No More Data</string>
     <string name="fragment_example_horizontal">Horizontal Scroll Mode</string>
@@ -59,6 +60,8 @@
     <string name="fragment_example_three_level">Three Level Refresh</string>
     <string name="fragment_example_bottom_sheet">Bottom Sheet</string>
     <string name="fragment_example_flex_box_layout">FlexBox Layout Manager</string>
+    <string name="fragment_example_disallow_intercept">Disallow Intercept</string>
+    <string name="fragment_example_staggered_grid">Staggered Grid</string>
 
     <string name="fragment_practice_instant">Instant</string>
 
@@ -82,12 +85,15 @@
     <string name="index_example_scroll">The usage of pure rolling mode</string>
     <string name="index_example_listener">The usage of multifunction listener</string>
     <string name="index_example_custom">The usage of custom Header</string>
+    <string name="index_example_i18n">The usage of I18n</string>
     <string name="index_example_snap_helper">The usage of SnapHelper</string>
     <string name="index_example_pager">The usage of ViewPager</string>
     <string name="index_example_bottom_sheet">The usage of BottomSheet</string>
     <string name="index_example_level">The usage of three level refresh</string>
-    <string name="index_example_flexbox">The usage of FlexboxLayoutManager</string>
+    <string name="index_example_flex_box">The usage of FlexboxLayoutManager</string>
     <string name="index_example_horizontal">The usage of Horizontal Scroll</string>
+    <string name="index_example_disallow_intercept">The usage of requestDisallowInterceptTouchEvent</string>
+    <string name="index_example_staggered_grid">The usage of StaggeredGridLayoutManager</string>
 
     <string name="item_style_theme_orange_abstract">Change theme to orange color</string>
     <string name="item_style_theme_red_abstract">Change theme to red color</string>
@@ -117,6 +123,11 @@
     <string name="item_example_number_abstract">This is the abstract item %02d</string>
     <string name="item_example_pager_left">Left Pager</string>
     <string name="item_example_pager_right">Right Pager</string>
+
+    <string name="item_example_i18n_system">System</string>
+    <string name="item_example_i18n_chinese">Chinese</string>
+    <string name="item_example_i18n_english">English</string>
+    <string name="item_example_i18n_click">Click to switch the language to %s</string>
 
     <string name="github_qq_browser_kernel">The web page is provided by github.com.\nThe QQ browser X5 kernel has been enabled.</string>
 
@@ -162,6 +173,10 @@
 
     <string name="instant_message_input_hint">input message</string>
     <string name="instant_message_send">Send</string>
+    <string name="switch_scroll_content_when_loaded">Scroll Content</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

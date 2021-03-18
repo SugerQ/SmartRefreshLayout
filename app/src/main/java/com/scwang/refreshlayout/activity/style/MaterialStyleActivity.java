@@ -55,18 +55,20 @@ public class MaterialStyleActivity extends AppCompatActivity implements AdapterV
         setContentView(R.layout.activity_style_material);
 
         mToolbar = findViewById(R.id.toolbar);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        mToolbar.setNavigationOnClickListener(v -> finish());
 
         mRefreshLayout = findViewById(R.id.refreshLayout);
         if (isFirstEnter) {
             isFirstEnter = false;
             mRefreshLayout.autoRefresh();//第一次进入触发自动刷新，演示效果
         }
+
+        mToolbar.setOnLongClickListener(v -> {
+            mRefreshLayout.autoRefreshAnimationOnly();
+            mRefreshLayout.autoRefreshAnimationOnly();
+            mRefreshLayout.autoRefreshAnimationOnly();
+            return true;
+        });
 
         mMaterialHeader = (MaterialHeader)mRefreshLayout.getRefreshHeader();
 
@@ -124,6 +126,8 @@ public class MaterialStyleActivity extends AppCompatActivity implements AdapterV
     private void setThemeColor(int colorPrimary, int colorPrimaryDark) {
         mToolbar.setBackgroundResource(colorPrimary);
         mRefreshLayout.setPrimaryColorsId(colorPrimary, android.R.color.white);
+        mMaterialHeader.setProgressBackgroundColorSchemeResource(colorPrimary);
+        mMaterialHeader.setColorSchemeResources(android.R.color.white);
         if (Build.VERSION.SDK_INT >= 21) {
             getWindow().setStatusBarColor(ContextCompat.getColor(this, colorPrimaryDark));
         }

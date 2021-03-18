@@ -24,22 +24,25 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * 二级刷新
- * Created by SCWANG on 2017/5/26.
+ * Created by scwang on 2017/5/26.
  */
-@SuppressWarnings({"unused", "UnusedReturnValue", "deprecation"})
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*, NestedScrollingParent*/ {
 
     //<editor-fold desc="属性字段">
     protected int mSpinner;
     protected float mPercent = 0;
-    protected float mMaxRage = 2.5f;
-    protected float mFloorRage = 1.9f;
-    protected float mRefreshRage = 1f;
+    protected float mMaxRate = 2.5f;
+    protected float mFloorRate = 1.9f;
+    protected float mRefreshRate = 1f;
     protected boolean mEnableTwoLevel = true;
     protected boolean mEnablePullToCloseTwoLevel = true;
-    protected int mFloorDuration = 1000;
+    protected boolean mEnableFloorRefresh = true;
     protected int mHeaderHeight;
-//    protected int mPaintAlpha;
+    protected int mFloorDuration = 1000;
+    protected float mFloorOpenLayoutRate = 1f;//二楼打开时，二楼所占高度比
+    protected float mFloorBottomDragLayoutRate = 1f/6;//二楼打开时，底部上划关闭二楼，所占高度比
+    //    protected int mPaintAlpha;
 //    protected Paint mPaint;
     protected RefreshInternal mRefreshHeader;
     protected RefreshKernel mRefreshKernel;
@@ -60,16 +63,21 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
 
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.TwoLevelHeader);
 
-        mMaxRage = ta.getFloat(R.styleable.TwoLevelHeader_srlMaxRage, mMaxRage);
-        mFloorRage = ta.getFloat(R.styleable.TwoLevelHeader_srlFloorRage, mFloorRage);
-        mRefreshRage = ta.getFloat(R.styleable.TwoLevelHeader_srlRefreshRage, mRefreshRage);
+        mMaxRate = ta.getFloat(R.styleable.TwoLevelHeader_srlMaxRage, mMaxRate);
+        mFloorRate = ta.getFloat(R.styleable.TwoLevelHeader_srlFloorRage, mFloorRate);
+        mRefreshRate = ta.getFloat(R.styleable.TwoLevelHeader_srlRefreshRage, mRefreshRate);
+        mMaxRate = ta.getFloat(R.styleable.TwoLevelHeader_srlMaxRate, mMaxRate);
+        mFloorRate = ta.getFloat(R.styleable.TwoLevelHeader_srlFloorRate, mFloorRate);
+        mRefreshRate = ta.getFloat(R.styleable.TwoLevelHeader_srlRefreshRate, mRefreshRate);
         mFloorDuration = ta.getInt(R.styleable.TwoLevelHeader_srlFloorDuration, mFloorDuration);
         mEnableTwoLevel = ta.getBoolean(R.styleable.TwoLevelHeader_srlEnableTwoLevel, mEnableTwoLevel);
+        mEnableFloorRefresh = ta.getBoolean(R.styleable.TwoLevelHeader_srlEnableFloorRefresh, mEnableFloorRefresh);
+        mFloorOpenLayoutRate = ta.getFloat(R.styleable.TwoLevelHeader_srlFloorOpenLayoutRate, mFloorOpenLayoutRate);
+        mFloorBottomDragLayoutRate = ta.getFloat(R.styleable.TwoLevelHeader_srlFloorBottomDragLayoutRate, mFloorBottomDragLayoutRate);
         mEnablePullToCloseTwoLevel = ta.getBoolean(R.styleable.TwoLevelHeader_srlEnablePullToCloseTwoLevel, mEnablePullToCloseTwoLevel);
 
         ta.recycle();
     }
-
     //</editor-fold>
 
     //<editor-fold desc="生命周期">
@@ -86,10 +94,6 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
                 break;
             }
         }
-        if (mRefreshHeader == null) {
-            final ViewGroup thisView = this;
-            setRefreshHeader(new ClassicsHeader(thisView.getContext()));
-        }
     }
 
     @Override
@@ -97,7 +101,7 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
         super.onAttachedToWindow();
         mSpinnerStyle = SpinnerStyle.MatchLayout;
         if (mRefreshHeader == null) {
-            final ViewGroup thisView = this;
+            final View thisView = this;
             setRefreshHeader(new ClassicsHeader(thisView.getContext()));
         }
     }
@@ -138,10 +142,10 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
         if (refreshHeader == null) {
             return;
         }
-        if (1f * (maxDragHeight + height) / height != mMaxRage && mHeaderHeight == 0) {
+        if (1f * (maxDragHeight + height) / height != mMaxRate && mHeaderHeight == 0) {
             mHeaderHeight = height;
             mRefreshHeader = null;
-            kernel.getRefreshLayout().setHeaderMaxDragRate(mMaxRage);
+            kernel.getRefreshLayout().setHeaderMaxDragRate(mMaxRate);
             mRefreshHeader = refreshHeader;
         }
         if (mRefreshKernel == null //第一次初始化
@@ -154,7 +158,7 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
 
         mHeaderHeight = height;
         mRefreshKernel = kernel;
-        kernel.requestFloorDuration(mFloorDuration);
+        kernel.requestFloorParams(mFloorDuration, mFloorOpenLayoutRate, mFloorBottomDragLayoutRate);
         kernel.requestNeedTouchEventFor(this, !mEnablePullToCloseTwoLevel);
         refreshHeader.onInitialized(kernel, height, maxDragHeight);
 
@@ -165,6 +169,9 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
         final RefreshInternal refreshHeader = mRefreshHeader;
         if (refreshHeader != null) {
             final OnStateChangedListener listener = mRefreshHeader;
+            if (newState == RefreshState.ReleaseToRefresh && !mEnableFloorRefresh) {
+                newState = RefreshState.PullDownToRefresh;
+            }
             listener.onStateChanged(refreshLayout, oldState, newState);
             switch (newState) {
                 case TwoLevelReleased:
@@ -202,12 +209,14 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
             refreshHeader.onMoving(isDragging, percent, offset, height, maxDragHeight);
         }
         if (isDragging) {
-            if (mPercent < mFloorRage && percent >= mFloorRage && mEnableTwoLevel) {
+            if (mPercent < mFloorRate && percent >= mFloorRate && mEnableTwoLevel) {
                 refreshKernel.setState(RefreshState.ReleaseToTwoLevel);
-            } else if (mPercent >= mFloorRage && percent < mRefreshRage) {
+            } else if (mPercent >= mFloorRate && percent < mRefreshRate) {
                 refreshKernel.setState(RefreshState.PullDownToRefresh);
-            } else if (mPercent >= mFloorRage && percent < mFloorRage) {
+            } else if (mPercent >= mFloorRate && percent < mFloorRate && mEnableFloorRefresh) {
                 refreshKernel.setState(RefreshState.ReleaseToRefresh);
+            } else if (!mEnableFloorRefresh && refreshKernel.getRefreshLayout().getState() != RefreshState.ReleaseToTwoLevel) {
+                refreshKernel.setState(RefreshState.PullDownToRefresh);
             }
             mPercent = percent;
         }
@@ -226,7 +235,6 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
             }
         }
     }
-
     //</editor-fold>
 
 //    private int mNestedScrollAxes = 0;
@@ -245,7 +253,6 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
 //    public int getNestedScrollAxes() {return mNestedScrollAxes;}
 
     //<editor-fold desc="开放接口 - API">
-
     /**
      * 设置指定的 Header
      * @param header RefreshHeader
@@ -270,10 +277,20 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
                 thisGroup.removeView(refreshHeader.getView());
             }
             refreshHeader = header;
+            /*
+             * 2020-3-16 修复 header 中自带 LayoutParams 丢失问题
+             */
+            width = width == 0 ? MATCH_PARENT : width;
+            height = height == 0 ? WRAP_CONTENT : height;
+            LayoutParams lp = new LayoutParams(width, height);
+            Object olp = refreshHeader.getView().getLayoutParams();
+            if (olp instanceof LayoutParams) {
+                lp = ((LayoutParams) olp);
+            }
             if (refreshHeader.getSpinnerStyle() == SpinnerStyle.FixedBehind) {
-                thisGroup.addView(refreshHeader.getView(), 0, new LayoutParams(width, height));
+                thisGroup.addView(refreshHeader.getView(), 0, lp);
             } else {
-                thisGroup.addView(refreshHeader.getView(), thisGroup.getChildCount(), new LayoutParams(width, height));
+                thisGroup.addView(refreshHeader.getView(), thisGroup.getChildCount(), lp);
             }
             this.mRefreshHeader = header;
             this.mWrappedInternal = header;
@@ -286,13 +303,13 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
      * @param rate MaxDragHeight/HeaderHeight
      * @return TwoLevelHeader
      */
-    public TwoLevelHeader setMaxRage(float rate) {
-        if (this.mMaxRage != rate) {
-            this.mMaxRage = rate;
+    public TwoLevelHeader setMaxRate(float rate) {
+        if (this.mMaxRate != rate) {
+            this.mMaxRate = rate;
             final RefreshKernel refreshKernel = mRefreshKernel;
             if (refreshKernel != null) {
                 this.mHeaderHeight = 0;
-                refreshKernel.getRefreshLayout().setHeaderMaxDragRate(mMaxRage);
+                refreshKernel.getRefreshLayout().setHeaderMaxDragRate(mMaxRate);
             }
         }
         return this;
@@ -314,21 +331,21 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
 
     /**
      * 设置触发二楼的白百分比
-     * @param rate 比率 要求大于 RefreshRage
+     * @param rate 比率 要求大于 RefreshRate
      * @return TwoLevelHeader
      */
-    public TwoLevelHeader setFloorRage(float rate) {
-        this.mFloorRage = rate;
+    public TwoLevelHeader setFloorRate(float rate) {
+        this.mFloorRate = rate;
         return this;
     }
 
     /**
      * 设置触发刷新的百分比
-     * @param rate 比率 要求小于 FloorRage
+     * @param rate 比率 要求小于 FloorRate
      * @return TwoLevelHeader
      */
-    public TwoLevelHeader setRefreshRage(float rate) {
-        this.mRefreshRage = rate;
+    public TwoLevelHeader setRefreshRate(float rate) {
+        this.mRefreshRate = rate;
         return this;
     }
 
@@ -388,6 +405,5 @@ public class TwoLevelHeader extends InternalAbstract implements RefreshHeader/*,
         }
         return this;
     }
-
     //</editor-fold>
 }

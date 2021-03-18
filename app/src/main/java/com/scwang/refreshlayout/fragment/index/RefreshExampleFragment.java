@@ -21,20 +21,13 @@ import com.scwang.refreshlayout.R;
 import com.scwang.refreshlayout.activity.FragmentActivity;
 import com.scwang.refreshlayout.activity.example.BasicExampleActivity;
 import com.scwang.refreshlayout.activity.example.CustomExampleActivity;
+import com.scwang.refreshlayout.activity.example.I18nExampleActivity;
 import com.scwang.refreshlayout.activity.example.ListenerExampleActivity;
 import com.scwang.refreshlayout.activity.example.NestedLayoutExampleActivity;
 import com.scwang.refreshlayout.activity.example.SnapHelperExampleActivity;
 import com.scwang.refreshlayout.adapter.BaseRecyclerAdapter;
 import com.scwang.refreshlayout.adapter.SmartViewHolder;
-import com.scwang.refreshlayout.fragment.example.BottomSheetExampleFragment;
-import com.scwang.refreshlayout.fragment.example.EmptyLayoutExampleFragment;
-import com.scwang.refreshlayout.fragment.example.FlexBoxLayoutManagerFragment;
-import com.scwang.refreshlayout.fragment.example.HorizontalExampleFragment;
-import com.scwang.refreshlayout.fragment.example.NestedScrollExampleFragment;
-import com.scwang.refreshlayout.fragment.example.NoMoreDataExampleFragment;
-import com.scwang.refreshlayout.fragment.example.PureScrollExampleFragment;
-import com.scwang.refreshlayout.fragment.example.SpecifyStyleExampleFragment;
-import com.scwang.refreshlayout.fragment.example.ViewPagerExampleFragment;
+import com.scwang.refreshlayout.fragment.example.*;
 import com.scwang.refreshlayout.util.StatusBarUtil;
 
 import java.util.Arrays;
@@ -58,11 +51,14 @@ public class RefreshExampleFragment extends Fragment implements AdapterView.OnIt
         PureScroll(R.string.index_example_scroll, PureScrollExampleFragment.class),
         Listener(R.string.index_example_listener, ListenerExampleActivity.class),
         Custom(R.string.index_example_custom, CustomExampleActivity.class),
+        I18N(R.string.index_example_custom, I18nExampleActivity.class),
         SnapHelper(R.string.index_example_snap_helper, SnapHelperExampleActivity.class),
         ViewPager(R.string.index_example_pager, ViewPagerExampleFragment.class),
         BottomSheet(R.string.index_example_bottom_sheet,BottomSheetExampleFragment.class),
-        FlexBoxLayout(R.string.index_example_flexbox, FlexBoxLayoutManagerFragment.class),
+        FlexBoxLayout(R.string.index_example_flex_box, FlexBoxLayoutManagerFragment.class),
         Horizontal(R.string.index_example_horizontal, HorizontalExampleFragment.class),
+        DisallowIntercept(R.string.index_example_disallow_intercept, DisallowInterceptExampleFragment.class),
+        StaggeredGrid(R.string.index_example_disallow_intercept, StaggeredGridExampleFragment.class),
 //        ThreeLevel(R.string.index_example_level, ThreeLevelExampleFragment.class),
         ;
         public int nameId;

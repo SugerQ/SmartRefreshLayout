@@ -34,7 +34,7 @@ import static com.scwang.smartrefresh.layout.util.SmartUtil.scrollListBy;
 
 /**
  * 刷新内容包装
- * Created by SCWANG on 2017/5/26.
+ * Created by scwang on 2017/5/26.
  */
 @SuppressWarnings("WeakerAccess")
 public class RefreshContentWrapper implements RefreshContent, CoordinatorLayoutListener, AnimatorUpdateListener {
@@ -84,9 +84,9 @@ public class RefreshContentWrapper implements RefreshContent, CoordinatorLayoutL
 
     protected View findScrollableViewInternal(View content, boolean selfAble) {
         View scrollableView = null;
-        Queue<View> views = new LinkedList<>();
+        final Queue<View> views = new LinkedList<>();
         //noinspection unchecked
-        List<View> list = (List<View>)views;
+        final List<View> list = (List<View>)views;
         list.add(content);
         while (list.size() > 0 && scrollableView == null) {
             View view = views.poll();
