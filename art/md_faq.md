@@ -12,17 +12,17 @@ SmartRefresh默认使用了比较新的功能，如：越界回弹、越界拖�
 ~~~
 XML属性
 ~~~xml
-    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:srlEnableOverScrollDrag="false"
         app:srlEnableAutoLoadMore="false"
         app:srlEnableOverScrollBounce="false">
-    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 ~~~
 
-## 1.获取当前状态？isRefreshing(),isLoading() 不见了？（1.1.0以上版本）
+## 1.获取当前状态？isRefreshing(),isLoading() 不见了？（1.1.0以上版本，2.x 回归）
 
 版本的迭代，刷新的状态越来越多，仅仅 isRefreshing(),isLoading() 已经无法满足要求，在1.0.5版本之后本库直接将
 内部 State 开放出来，并在1.0.5版本标记 isRefreshing(),isLoading() 过期，鼓励大家使用 getState 来代替。将在
@@ -42,7 +42,9 @@ getState 比前两个方法更有用，具体参考下面代码。
 
 ## 2.嵌套WebView，还没滚动到顶部就开始下拉刷新了？
 
-> WebView 的问题多由内部Html中采用了绝对坐标导致的，所以问题很难从java层面解决这个问题，我建议直接再Html内部实现下拉刷新，或者采用自定义滚动边界，参考 [#394](https://github.com/scwang90/SmartRefreshLayout/issues/394)。
+> WebView 的问题多由内部Html中采用了绝对坐标导致的，所以问题很难从java层面解决这个问题。
+我建议直接再Html内部实现下拉刷新，或者采用自定义滚动边界，参考 [#394](https://github.com/scwang90/SmartRefreshLayout/issues/394)。
+另外 [SCDN](https://blog.csdn.net/niuzhijun66/article/details/86290182) 博客中有人给出解决方案
 
 ## 3.列表内容才几条，却可以上拉加载？
 
@@ -54,12 +56,12 @@ SmartRefresh提供了对数据不满一页判断处理，可以通过EnableLoadM
 ~~~
 XML属性
 ~~~xml
-    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:srlEnableLoadMoreWhenContentNotFull="false">
-    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 ~~~
 
 
@@ -120,7 +122,7 @@ public class App extends Application {
 
 XML直接指定（1.1.0 最新版）
 ~~~xml
-    <com.scwang.smartrefresh.layout.header.ClassicsHeader
+    <com.scwang.smart.refresh.footer.ClassicsFooter
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:srlTextPulling="@string/srl_header_pulling"
@@ -132,7 +134,7 @@ XML直接指定（1.1.0 最新版）
         app:srlTextSecondary="@string/srl_header_secondary"
         app:srlTextRefreshing="@string/srl_header_refreshing"/>
 
-    <com.scwang.smartrefresh.layout.header.ClassicsFooter
+    <com.scwang.smart.refresh.footer.ClassicsFooter
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:srlTextPulling="@string/srl_footer_pulling"
@@ -234,12 +236,12 @@ refreshlayout.setEnableAutoLoadMore(false);
 ~~~
 XML属性
 ~~~xml
-    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+    <com.scwang.smart.refresh.layout.SmartRefreshLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:srlEnableAutoLoadMore="false">
-    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
+    </com.scwang.smart.refresh.layout.SmartRefreshLayout>
 ~~~
 
 ## 8.还没调用 finishRefresh ，刷新就自动结束了？
@@ -259,7 +261,7 @@ XML属性
 
 注意：是**固定**的头布局，如果是想添加可以滚动的头布局，请使用开源的Adapter实现
 
-## 11.显示全部加载完成，并不再触发加载更事件
+## 11.显示没有更多数据，并不再触发加载更事件
 
 ~~~java
 //加载结束之后的逻辑
@@ -311,3 +313,31 @@ footer.setFinishDuration(0);//设置Footer 的 “加载完成” 显示时间�
 1. 如果是 RecyclerView 和 NestScrollView 先尝试打开 Smart 的嵌套滚动功能
 2. 如果是 ListVIew，ScrollView，可以尝试 同时打开 ScrollView，ScrollView，Smart 的嵌套滚动功能
 3. 如果 1，2 都无效，这需要自定义滚动边界自己实现 canRefresh 和 canLoadMore，自己用代码告诉Smart 什么时候可以 刷新，什么时候可以加载
+
+## 16.finishLoadMoreWithNoMoreData /没有更多数据 账号，Footer 还显示了loading/转圈
+
+1.最常见的原因是 finishLoadMore 和 finishLoadMoreWithNoMoreData 同时调用导致的。
+他们都有关闭 Footer 的功能，所以 finishLoadMore 会导致 finishLoadMoreWithNoMoreData 功能异常。
+这样解释会比较清楚 finishLoadMoreWithNoMoreData = finishLoadMore + setNoMoreData(true)
+所以解决办法是去掉 finishLoadMoreWithNoMoreData 前面的 finishLoadMore 如下：
+```java
+    //refreshLayout.finishLoadMore(); //前面的 finishLoadMore 要删除
+    if(true/*没有更多数据*/) {
+        refreshLayout.finishLoadMoreWithNoMoreData();
+    } else {
+        refreshLayout.finishLoadMore(); //在 else 中添加 finishLoadMore
+    }
+```
+
+2.少见原因（1.1.0版本以前） 只调用了 setNoMoreData(true) 未调用 finishLoadMore
+setNoMoreData 的关闭 Footer 功能是 1.1.0 后面添加的，所以之前的版本
+setNoMoreData 必须和 finishLoadMore 一起使用如：
+```java
+    if(true/*没有更多数据*/) {
+        refreshLayout.setNoMoreData(true);
+        refreshLayout.finishLoadMore()// setNoMoreData 后面必须加finishLoadMore（1.1.0版本以前）
+        //refreshLayout.finishLoadMoreWithNoMoreData(); 也可以用 finishLoadMoreWithNoMoreData 代替上面两行
+    } else {
+        refreshLayout.finishLoadMore();
+    }
+```

@@ -10,13 +10,12 @@ import com.scwang.smartrefresh.layout.constant.RefreshState;
 
 /**
  * 多功能监听器
- * Created by SCWANG on 2017/5/26.
+ * Created by scwang on 2017/5/26.
  */
-
 public class SimpleMultiPurposeListener implements OnMultiPurposeListener, OnMultiListener {
 
-    protected RefreshLayout refreshLayout;
-    protected OnMultiPurposeListener listener;
+    private RefreshLayout refreshLayout;
+    private OnMultiPurposeListener listener;
 
     public SimpleMultiPurposeListener() {
 

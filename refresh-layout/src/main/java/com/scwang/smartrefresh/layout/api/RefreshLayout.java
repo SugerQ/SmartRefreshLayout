@@ -11,8 +11,9 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshLoadMoreListener;
 /**
  * 刷新布局
  * interface of the refresh layout
- * Created by SCWANG on 2017/5/26.
+ * Created by scwang on 2017/5/26.
  */
+@SuppressWarnings("UnusedReturnValue")
 public interface RefreshLayout extends com.scwang.smart.refresh.layout.api.RefreshLayout {
 
     /**
@@ -122,6 +123,5 @@ public interface RefreshLayout extends com.scwang.smart.refresh.layout.api.Refre
 //     */
 //    @NonNull
 //    RefreshState getState();
-
 
 }

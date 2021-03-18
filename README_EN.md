@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License%20-Apache%202-337ab7.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Arsenal](https://img.shields.io/badge/Arsenal%20-%20SmartRefresh-4cae4c.svg)](https://android-arsenal.com/details/1/6001)
-[![JCenter](https://img.shields.io/badge/%20Jcenter%20-1.1.0-5bc0de.svg)](https://bintray.com/scwang90/maven/SmartRefreshLayout/_latestVersion)
+[![JCenter](https://img.shields.io/badge/%20Jcenter%20-2.0.3-5bc0de.svg)](https://bintray.com/scwang90/maven/refresh-layout-kernel/_latestVersion)
 [![MinSdk](https://img.shields.io/badge/%20MinSdk%20-%2012%2B%20-f0ad4e.svg)](https://android-arsenal.com/api?level=12)
 [![Methods](https://img.shields.io/badge/Methods%20%7C%20Size%20-%20784%20%7C%20122%20KB-d9534f.svg)](http://www.methodscount.com/?lib=com.scwang.smartrefresh%3ASmartRefreshLayout%3A1.1.0)
 
@@ -90,55 +90,89 @@ The two above headers are implemented by myself, The following headers are colle
 
 
 See so many cool headers, is not it feel great? At this point you may be worried that so many headers together, but usually only use one, is not to introduce a lot of useless code and resources?    
-Please rest assured that I have divided it into three packages, when used to reference their own it!
+Please rest assured that I have divided it into eight packages, when used to reference their own it!
 
- - **SmartRefreshLayout:** The core to realize，Bring ClassicsHeader and BezierRadarHeader.
- - **SmartRefreshHeader:** Integration of various kinds of the Header.
- - **SmartRefreshFooter:** Integration of various kinds of the Footer.
+ - refresh-layout-kernel        core
+ - refresh-header-classics      ClassicsHeader
+ - refresh-header-radar         BezierRadarHeader
+ - refresh-header-falsify       FalsifyHeader
+ - refresh-header-material      MaterialHeader
+ - refresh-header-two-level     TwoLevelHeader
+ - refresh-footer-ball          BallPulseFooter
+ - refresh-footer-classics      ClassicsFooter
 
 ## Usage
 #### 1.Add a gradle dependency.
+
+V 2.x changed the package name relative to 1.x, such as `com.scwang.smartrefresh` to `com.scwang.smart.refresh`.
+It is suggested that in the new project, if the old project is upgraded,
+the package name should be replaced, which is more troublesome.
+But the main change is to subcontract SmartRefreshLayout to reduce unnecessary dependencies and avoid code redundancy.
+However, there is no subcontracting to SmartRefreshHeader.
+There are more than ten headers in it.
+It is recommended that you copy the source code into the project whenever you need to use it.
+
 ```
-implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-beta-1'
-implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0-beta-1'//If you use the special Header
-implementation 'com.android.support:appcompat-v7:25.3.1'
+// Note: There will be no default Header and Footer after subcontracting. It needs to be added manually!
+implementation  'com.scwang.smart:refresh-layout-kernel:2.0.3'      //core
+implementation  'com.scwang.smart:refresh-header-classics:2.0.3'    //ClassicsHeader
+implementation  'com.scwang.smart:refresh-header-radar:2.0.3'       //BezierRadarHeader
+implementation  'com.scwang.smart:refresh-header-falsify:2.0.3'     //FalsifyHeader
+implementation  'com.scwang.smart:refresh-header-material:2.0.3'    //MaterialHeader
+implementation  'com.scwang.smart:refresh-header-two-level:2.0.3'   //TwoLevelHeader
+implementation  'com.scwang.smart:refresh-footer-ball:2.0.3'        //BallPulseFooter
+implementation  'com.scwang.smart:refresh-footer-classics:2.0.3'    //ClassicsFooter
 
-//androidx version
-implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-andx-16'
-implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.1.0-andx-16'
-implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+```
+<!-- // The package name of `com.scwang.smartrefresh` is retained, but not subcontracted. -->
+<!-- implementation 'com.scwang.smartrefresh:SmartRefreshHeader:2.0.3'   //Headers -->
+<!-- implementation 'com.scwang.smartrefresh:SmartRefreshFooter:2.0.3'   //Footers -->
+<!-- implementation 'com.scwang.smartrefresh:SmartRefreshLayout:2.0.3'   //core、 default Header and Footer -->
 
+If you use AndroidX, add it to gradle.properties
+
+```
+android.useAndroidX=true
+android.enableJetifier=true
 ```
 
 #### 2.Add SmartRefreshLayout in the layout xml.
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<com.scwang.smartrefresh.layout.SmartRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.scwang.smart.refresh.layout.SmartRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/refreshLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <com.scwang.smart.refresh.header.ClassicsHeader
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:overScrollMode="never"
         android:background="#fff" />
-</com.scwang.smartrefresh.layout.SmartRefreshLayout>
+    <com.scwang.smart.refresh.footer.ClassicsFooter
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</com.scwang.smart.refresh.layout.SmartRefreshLayout>
 ```
 
 #### 3.Coding in the Activity or Fragment.
 ```java
 RefreshLayout refreshLayout = (RefreshLayout)findViewById(R.id.refreshLayout);
+refreshLayout.setRefreshHeader(new ClassicsHeader(this));
+refreshLayout.setRefreshFooter(new ClassicsFooter(this));
 refreshLayout.setOnRefreshListener(new OnRefreshListener() {
     @Override
     public void onRefresh(RefreshLayout refreshlayout) {
-        refreshlayout.finishRefresh(2000);
+        refreshlayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
     }
 });
 refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
     @Override
     public void onLoadMore(RefreshLayout refreshlayout) {
-        refreshlayout.finishLoadMore(2000);
+        refreshlayout.finishLoadMore(2000/*,false*/);//传入false表示加载失败
     }
 });
 ```
@@ -171,7 +205,7 @@ Note: this method is the lowest priority.
 
 #### 2.Specified in the XML layout file
 ```xml
-<com.scwang.smartrefresh.layout.SmartRefreshLayout
+<com.scwang.smart.refresh.layout.SmartRefreshLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/refreshLayout"
     android:layout_width="match_parent"
@@ -182,7 +216,7 @@ Note: this method is the lowest priority.
     app:srlEnablePreviewInEditMode="true">
     <!--srlAccentColor and srlPrimaryColor, Will change the Header and Footer theme colors-->
     <!--srlEnablePreviewInEditMode, Can open and close the preview function-->
-    <com.scwang.smartrefresh.layout.header.ClassicsHeader
+    <com.scwang.smart.refresh.header.ClassicsHeader
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
@@ -191,10 +225,10 @@ Note: this method is the lowest priority.
         android:padding="@dimen/dimenPaddingCommon"
         android:background="@android:color/white"
         android:text="@string/description_define_in_xml"/>
-    <com.scwang.smartrefresh.layout.footer.ClassicsFooter
+    <com.scwang.smart.refresh.footer.ClassicsFooter
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-</com.scwang.smartrefresh.layout.SmartRefreshLayout>
+</com.scwang.smart.refresh.layout.SmartRefreshLayout>
 ```
 
 Note: this method of priority is medium。When using this method, the Android Studio will have preview effect, the following figure:
@@ -225,6 +259,8 @@ If in the donation message note name, it will be record to the list
 [Donation list](art/md_donationlist.md)
 
 #### blogroll
+[github/Loror](https://github.com/Loror)  
+[github/faith-hb/WidgetCase](https://github.com/faith-hb/WidgetCase)  
 [github/Bamboy120315/Freedom](https://github.com/Bamboy120315/Freedom)  
 [github/TommyLemon/APIJSON](https://github.com/TommyLemon/APIJSON)  
 [github/dengyuhan](https://github.com/dengyuhan)  

@@ -51,12 +51,9 @@ public abstract class ClassicsAbstract<T extends ClassicsAbstract> extends Simpl
     protected int mMinHeightOfContent = 0;
 
     //<editor-fold desc="RelativeLayout">
-
     public ClassicsAbstract(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
         mSpinnerStyle = SpinnerStyle.Translate;
-
     }
 
     @Override
@@ -72,7 +69,7 @@ public abstract class ClassicsAbstract<T extends ClassicsAbstract> extends Simpl
                 mPaddingBottom = mPaddingBottom == 0 ? SmartUtil.dp2px(20) : mPaddingBottom;
                 thisView.setPadding(paddingLeft, mPaddingTop, paddingRight, mPaddingBottom);
             }
-            ViewGroup thisGroup = this;
+            final ViewGroup thisGroup = this;
             thisGroup.setClipToPadding(false);
         }
         if (MeasureSpec.getMode(heightMeasureSpec) == EXACTLY) {
@@ -83,7 +80,6 @@ public abstract class ClassicsAbstract<T extends ClassicsAbstract> extends Simpl
             } else {
                 thisView.setPadding(thisView.getPaddingLeft(), 0, thisView.getPaddingRight(), 0);
             }
-
         } else {
             thisView.setPadding(thisView.getPaddingLeft(), mPaddingTop, thisView.getPaddingRight(), mPaddingBottom);
         }
@@ -178,12 +174,9 @@ public abstract class ClassicsAbstract<T extends ClassicsAbstract> extends Simpl
             }
         }
     }
-
-
     //</editor-fold>
 
     //<editor-fold desc="API">
-
     public T setProgressBitmap(Bitmap bitmap) {
         mProgressDrawable = null;
         mProgressView.setImageBitmap(bitmap);
@@ -378,6 +371,5 @@ public abstract class ClassicsAbstract<T extends ClassicsAbstract> extends Simpl
 //    public TextView getTitleText() {
 //        return mTitleText;
 //    }
-
     //</editor-fold>
 }

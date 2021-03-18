@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.scwang.smart.refresh.header.ClassicsHeader;
 import com.scwang.smartrefresh.layout.api.DefaultRefreshFooterCreator;
 import com.scwang.smartrefresh.layout.api.DefaultRefreshHeaderCreator;
 import com.scwang.smartrefresh.layout.api.DefaultRefreshInitializer;
@@ -14,6 +15,8 @@ import com.scwang.smartrefresh.layout.api.RefreshFooter;
 import com.scwang.smartrefresh.layout.api.RefreshHeader;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.api.ScrollBoundaryDecider;
+import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
+import com.scwang.smartrefresh.layout.header.BezierRadarHeader;
 import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnMultiPurposeListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
@@ -26,7 +29,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 /**
  * 智能刷新布局
  * Intelligent RefreshLayout
- * Created by SCWANG on 2017/5/26.
+ * Created by scwang on 2017/5/26.
  */
 @SuppressLint("RestrictedApi")
 @SuppressWarnings({"unused"})
@@ -40,7 +43,6 @@ public class SmartRefreshLayout extends com.scwang.smart.refresh.layout.SmartRef
     public SmartRefreshLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-
     //</editor-fold>
 
     //<editor-fold desc="开放接口 open interface">
@@ -236,7 +238,11 @@ public class SmartRefreshLayout extends com.scwang.smart.refresh.layout.SmartRef
             @NonNull
             @Override
             public com.scwang.smart.refresh.layout.api.RefreshHeader createRefreshHeader(@NonNull Context context, @NonNull com.scwang.smart.refresh.layout.api.RefreshLayout layout) {
-                return creator.createRefreshHeader(context, (RefreshLayout) layout);
+                if (layout instanceof RefreshLayout) {
+                    return creator.createRefreshHeader(context, (RefreshLayout) layout);
+                } else {
+                    return new BezierRadarHeader(context);
+                }
             }
         });
     }
@@ -250,7 +256,11 @@ public class SmartRefreshLayout extends com.scwang.smart.refresh.layout.SmartRef
             @NonNull
             @Override
             public com.scwang.smart.refresh.layout.api.RefreshFooter createRefreshFooter(@NonNull Context context, @NonNull com.scwang.smart.refresh.layout.api.RefreshLayout layout) {
-                return creator.createRefreshFooter(context, (RefreshLayout) layout);
+                if (layout instanceof RefreshLayout) {
+                    return creator.createRefreshFooter(context, (RefreshLayout) layout);
+                } else {
+                    return new BallPulseFooter(context);
+                }
             }
         });
     }
@@ -263,11 +273,12 @@ public class SmartRefreshLayout extends com.scwang.smart.refresh.layout.SmartRef
         com.scwang.smart.refresh.layout.SmartRefreshLayout.setDefaultRefreshInitializer(new com.scwang.smart.refresh.layout.listener.DefaultRefreshInitializer() {
             @Override
             public void initialize(@NonNull Context context, @NonNull com.scwang.smart.refresh.layout.api.RefreshLayout layout) {
-                initializer.initialize(context, (RefreshLayout)layout);
+                if (layout instanceof RefreshLayout) {
+                    initializer.initialize(context, (RefreshLayout)layout);
+                }
             }
         });
     }
-
     //</editor-fold>
 
 }

@@ -8,7 +8,7 @@ import com.scwang.smart.refresh.layout.constant.RefreshState;
 /**
  * 刷新布局核心功能接口
  * 为功能复杂的 Header 或者 Footer 开放的接口
- * Created by SCWANG on 2017/5/26.
+ * Created by scwang on 2017/5/26.
  */
 @SuppressWarnings({"unused", "UnusedReturnValue", "SameParameterValue"})
 public interface RefreshKernel {
@@ -51,7 +51,6 @@ public interface RefreshKernel {
      * @return ValueAnimator 如果没有执行动画 null
      */
     ValueAnimator animSpinner(int endSpinner);
-
     //</editor-fold>
 
     //<editor-fold desc="请求事件">
@@ -89,5 +88,10 @@ public interface RefreshKernel {
      * @return RefreshKernel
      */
     RefreshKernel requestFloorDuration(int duration);
+    /**
+     * 设置二楼底部上划关闭所占高度的比率
+     * @return RefreshKernel
+     */
+    RefreshKernel requestFloorBottomPullUpToCloseRate(float rate);
     //</editor-fold>
 }

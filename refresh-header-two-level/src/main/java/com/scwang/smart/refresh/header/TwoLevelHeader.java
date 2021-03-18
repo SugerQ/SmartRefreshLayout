@@ -25,7 +25,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * 二级刷新
- * Created by SCWANG on 2017/5/26.
+ * Created by scwang on 2017/5/26.
  */
 @SuppressWarnings({"unused", "UnusedReturnValue"})
 public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, NestedScrollingParent2 {
@@ -33,9 +33,11 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
     //<editor-fold desc="属性字段">
     protected int mSpinner;
     protected float mPercent = 0;
-    protected float mMaxRage = 2.5f;
-    protected float mFloorRage = 1.9f;
-    protected float mRefreshRage = 1f;
+    protected float mMaxRate = 2.5f;
+    protected float mFloorRate = 1.9f;
+    protected float mRefreshRate = 1f;
+    protected float mBottomPullUpToCloseRate = 1/6f;
+    protected boolean mEnableRefresh = true;
     protected boolean mEnableTwoLevel = true;
     protected boolean mEnablePullToCloseTwoLevel = true;
     protected int mFloorDuration = 1000;
@@ -44,7 +46,6 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
     protected RefreshComponent mRefreshHeader;
     protected RefreshKernel mRefreshKernel;
     protected OnTwoLevelListener mTwoLevelListener;
-
     //</editor-fold>
 
     //<editor-fold desc="构造方法">
@@ -59,16 +60,17 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
 
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.TwoLevelHeader);
 
-        mMaxRage = ta.getFloat(R.styleable.TwoLevelHeader_srlMaxRage, mMaxRage);
-        mFloorRage = ta.getFloat(R.styleable.TwoLevelHeader_srlFloorRage, mFloorRage);
-        mRefreshRage = ta.getFloat(R.styleable.TwoLevelHeader_srlRefreshRage, mRefreshRage);
+        mMaxRate = ta.getFloat(R.styleable.TwoLevelHeader_srlMaxRate, mMaxRate);
+        mFloorRate = ta.getFloat(R.styleable.TwoLevelHeader_srlFloorRate, mFloorRate);
+        mRefreshRate = ta.getFloat(R.styleable.TwoLevelHeader_srlRefreshRate, mRefreshRate);
         mFloorDuration = ta.getInt(R.styleable.TwoLevelHeader_srlFloorDuration, mFloorDuration);
+        mEnableRefresh = ta.getBoolean(R.styleable.TwoLevelHeader_srlEnableRefresh, mEnableRefresh);
         mEnableTwoLevel = ta.getBoolean(R.styleable.TwoLevelHeader_srlEnableTwoLevel, mEnableTwoLevel);
+        mBottomPullUpToCloseRate = ta.getFloat(R.styleable.TwoLevelHeader_srlBottomPullUpToCloseRate, mBottomPullUpToCloseRate);
         mEnablePullToCloseTwoLevel = ta.getBoolean(R.styleable.TwoLevelHeader_srlEnablePullToCloseTwoLevel, mEnablePullToCloseTwoLevel);
 
         ta.recycle();
     }
-
     //</editor-fold>
 
     //<editor-fold desc="生命周期">
@@ -137,10 +139,10 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
         if (refreshHeader == null) {
             return;
         }
-        if (1f * (maxDragHeight + height) / height != mMaxRage && mHeaderHeight == 0) {
+        if (1f * (maxDragHeight + height) / height != mMaxRate && mHeaderHeight == 0) {
             mHeaderHeight = height;
             mRefreshHeader = null;
-            kernel.getRefreshLayout().setHeaderMaxDragRate(mMaxRage);
+            kernel.getRefreshLayout().setHeaderMaxDragRate(mMaxRate);
             mRefreshHeader = refreshHeader;
         }
         if (mRefreshKernel == null //第一次初始化
@@ -154,6 +156,7 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
         mHeaderHeight = height;
         mRefreshKernel = kernel;
         kernel.requestFloorDuration(mFloorDuration);
+        kernel.requestFloorBottomPullUpToCloseRate(mBottomPullUpToCloseRate);
         kernel.requestNeedTouchEventFor(this, !mEnablePullToCloseTwoLevel);
         refreshHeader.onInitialized(kernel, height, maxDragHeight);
 
@@ -164,6 +167,9 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
         final RefreshComponent refreshHeader = mRefreshHeader;
         if (refreshHeader != null) {
             final OnStateChangedListener listener = mRefreshHeader;
+            if (newState == RefreshState.ReleaseToRefresh && !mEnableRefresh) {
+                newState = RefreshState.PullDownToRefresh;
+            }
             listener.onStateChanged(refreshLayout, oldState, newState);
             switch (newState) {
                 case TwoLevelReleased:
@@ -201,12 +207,14 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
             refreshHeader.onMoving(isDragging, percent, offset, height, maxDragHeight);
         }
         if (isDragging) {
-            if (mPercent < mFloorRage && percent >= mFloorRage && mEnableTwoLevel) {
+            if (mPercent < mFloorRate && percent >= mFloorRate && mEnableTwoLevel) {
                 refreshKernel.setState(RefreshState.ReleaseToTwoLevel);
-            } else if (mPercent >= mFloorRage && percent < mRefreshRage) {
+            } else if (mPercent >= mFloorRate && percent < mRefreshRate) {
                 refreshKernel.setState(RefreshState.PullDownToRefresh);
-            } else if (mPercent >= mFloorRage && percent < mFloorRage) {
+            } else if (mPercent >= mFloorRate && percent < mFloorRate && mEnableRefresh) {
                 refreshKernel.setState(RefreshState.ReleaseToRefresh);
+            } else if (!mEnableRefresh && refreshKernel.getRefreshLayout().getState() != RefreshState.ReleaseToTwoLevel) {
+                refreshKernel.setState(RefreshState.PullDownToRefresh);
             }
             mPercent = percent;
         }
@@ -225,7 +233,6 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
             }
         }
     }
-
     //</editor-fold>
 
     //<editor-fold desc="NestedScrollingParent2">
@@ -268,7 +275,6 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
     public void onNestedPreScroll(@NonNull View target, int dx, int dy, @NonNull int[] consumed, int i2) {
 
     }
-
     //</editor-fold>
 
     //<editor-fold desc="开放接口 - API">
@@ -279,7 +285,7 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
      * @return TwoLevelHeader
      */
     public TwoLevelHeader setRefreshHeader(RefreshHeader header) {
-        return setRefreshHeader(header, MATCH_PARENT, WRAP_CONTENT);
+        return setRefreshHeader(header, 0, 0);
     }
 
     /**
@@ -292,15 +298,26 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
     public TwoLevelHeader setRefreshHeader(RefreshHeader header, int width, int height) {
         final ViewGroup thisGroup = this;
         if (header != null) {
+            /*
+             * 2020-3-16 修复 header 中自带 LayoutParams 丢失问题
+             */
+            width = width == 0 ? MATCH_PARENT : width;
+            height = height == 0 ? WRAP_CONTENT : height;
+            LayoutParams lp = new LayoutParams(width, height);
+            Object olp = header.getView().getLayoutParams();
+            if (olp instanceof LayoutParams) {
+                lp = ((LayoutParams) olp);
+            }
+
             RefreshComponent refreshHeader = mRefreshHeader;
             if (refreshHeader != null) {
                 thisGroup.removeView(refreshHeader.getView());
             }
             refreshHeader = header;
             if (refreshHeader.getSpinnerStyle() == SpinnerStyle.FixedBehind) {
-                thisGroup.addView(refreshHeader.getView(), 0, new LayoutParams(width, height));
+                thisGroup.addView(refreshHeader.getView(), 0, lp);
             } else {
-                thisGroup.addView(refreshHeader.getView(), thisGroup.getChildCount(), new LayoutParams(width, height));
+                thisGroup.addView(refreshHeader.getView(), thisGroup.getChildCount(), lp);
             }
             this.mRefreshHeader = header;
             this.mWrappedInternal = header;
@@ -313,13 +330,13 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
      * @param rate MaxDragHeight/HeaderHeight
      * @return TwoLevelHeader
      */
-    public TwoLevelHeader setMaxRage(float rate) {
-        if (this.mMaxRage != rate) {
-            this.mMaxRage = rate;
+    public TwoLevelHeader setMaxRate(float rate) {
+        if (this.mMaxRate != rate) {
+            this.mMaxRate = rate;
             final RefreshKernel refreshKernel = mRefreshKernel;
             if (refreshKernel != null) {
                 this.mHeaderHeight = 0;
-                refreshKernel.getRefreshLayout().setHeaderMaxDragRate(mMaxRage);
+                refreshKernel.getRefreshLayout().setHeaderMaxDragRate(mMaxRate);
             }
         }
         return this;
@@ -340,22 +357,32 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
     }
 
     /**
-     * 设置触发二楼的白百分比
-     * @param rate 比率 要求大于 RefreshRage
+     * 设置是否开启
+     * @param enabled 刷新功能
      * @return TwoLevelHeader
      */
-    public TwoLevelHeader setFloorRage(float rate) {
-        this.mFloorRage = rate;
+    public TwoLevelHeader setEnableRefresh(boolean enabled) {
+        this.mEnableRefresh = enabled;
+        return this;
+    }
+
+    /**
+     * 设置触发二楼的白百分比
+     * @param rate 比率 要求大于 RefreshRate
+     * @return TwoLevelHeader
+     */
+    public TwoLevelHeader setFloorRate(float rate) {
+        this.mFloorRate = rate;
         return this;
     }
 
     /**
      * 设置触发刷新的百分比
-     * @param rate 比率 要求小于 FloorRage
+     * @param rate 比率 要求小于 FloorRate
      * @return TwoLevelHeader
      */
-    public TwoLevelHeader setRefreshRage(float rate) {
-        this.mRefreshRage = rate;
+    public TwoLevelHeader setRefreshRate(float rate) {
+        this.mRefreshRate = rate;
         return this;
     }
 
@@ -376,6 +403,15 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
      */
     public TwoLevelHeader setFloorDuration(int duration) {
         this.mFloorDuration = duration;
+        return this;
+    }
+
+    /**
+     * 设置二路底部上划关闭所占高度比率
+     * @param rate 底部占高度比率
+     */
+    public TwoLevelHeader setBottomPullUpToCloseRate(float rate) {
+        this.mBottomPullUpToCloseRate = rate;
         return this;
     }
 
@@ -415,6 +451,5 @@ public class TwoLevelHeader extends SimpleComponent implements RefreshHeader, Ne
         }
         return this;
     }
-
     //</editor-fold>
 }

@@ -3,6 +3,7 @@ package com.scwang.smart.refresh.layout.api;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -19,7 +20,7 @@ import com.scwang.smart.refresh.layout.listener.ScrollBoundaryDecider;
 /**
  * 刷新布局
  * interface of the refresh layout
- * Created by SCWANG on 2017/5/26.
+ * Created by scwang on 2017/5/26.
  */
 @SuppressWarnings({"UnusedReturnValue", "SameParameterValue", "unused"})
 public interface RefreshLayout {
@@ -297,16 +298,6 @@ public interface RefreshLayout {
     /**
      * Set whether or not Footer follows the content after there is no more data.
      * 设置是否在没有更多数据之后 Footer 跟随内容
-     * @deprecated use {@link RefreshLayout#setEnableFooterFollowWhenNoMoreData(boolean)}
-     * @param enabled 是否启用
-     * @return RefreshLayout
-     */
-    @Deprecated
-    RefreshLayout setEnableFooterFollowWhenLoadFinished(boolean enabled);
-
-    /**
-     * Set whether or not Footer follows the content after there is no more data.
-     * 设置是否在没有更多数据之后 Footer 跟随内容
      * @param enabled 是否启用
      * @return RefreshLayout
      */
@@ -335,21 +326,30 @@ public interface RefreshLayout {
      * @return RefreshLayout
      */
     RefreshLayout setEnableNestedScroll(boolean enabled);
-
-//    /**
-//     * Sets whether to enable pure nested scrolling mode
-//     * Smart scrolling supports both [nested scrolling] and [traditional scrolling] modes
-//     * With nested scrolling enabled, traditional mode also works when necessary
-//     * However, sometimes interference and conflict can occur. If you find this conflict, you can try to turn on [pure nested scrolling] mode and [traditional mode] off
-//     * 设置是否开启【纯嵌套滚动】模式
-//     * Smart 的滚动支持 【嵌套滚动】 + 【传统滚动】 两种模式
-//     * 在开启 【嵌套滚动】 的情况下，【传统模式】也会在必要的时候发挥作用
-//     * 但是有时候也会发生干扰和冲突，如果您发现了这个冲突，可以尝试开启 【纯嵌套滚动】模式，【传统模式】关闭
-//     * @param enabled 是否启用
-//     * @return RefreshLayout
-//     */
-//    RefreshLayout setEnableNestedScrollOnly(boolean enabled);
-
+    /**
+     * 设置固定在 Header 下方的视图Id，可以在 Footer 上下滚动的时候保持不跟谁滚动
+     * @param id 固定在头部的视图Id
+     * @return RefreshLayout
+     */
+    RefreshLayout setFixedHeaderViewId(@IdRes int id);
+    /**
+     * 设置固定在 Footer 上方的视图Id，可以在 Header 上下滚动的时候保持不跟谁滚动
+     * @param id 固定在底部的视图Id
+     * @return RefreshLayout
+     */
+    RefreshLayout setFixedFooterViewId(@IdRes int id);
+    /**
+     * 设置在 Header 上下滚动时，需要跟随滚动的视图Id，默认整个内容视图
+     * @param id 固定在头部的视图Id
+     * @return RefreshLayout
+     */
+    RefreshLayout setHeaderTranslationViewId(@IdRes int id);
+    /**
+     * 设置在 Footer 上下滚动时，需要跟随滚动的视图Id，默认整个内容视图
+     * @param id 固定在头部的视图Id
+     * @return RefreshLayout
+     */
+    RefreshLayout setFooterTranslationViewId(@IdRes int id);
     /**
      * Set whether to enable the action content view when refreshing.
      * 设置是否开启在刷新时候禁止操作内容视图
@@ -509,6 +509,9 @@ public interface RefreshLayout {
     /**
      * Close the Header or Footer, can't replace finishRefresh and finishLoadMore.
      * 关闭 Header 或者 Footer
+     * 注意：
+     * 1.closeHeaderOrFooter 任何时候任何状态都能关闭  header 和 footer
+     * 2.finishRefresh 和 finishLoadMore 只能在 刷新 或者 加载 的时候关闭
      * @return RefreshLayout
      */
     RefreshLayout closeHeaderOrFooter();
@@ -579,7 +582,6 @@ public interface RefreshLayout {
      * @return true or false, Status non-compliance will fail.
      *         是否成功（状态不符合会失败）
      */
-//    @Deprecated
     boolean autoRefresh(int delayed);
 
     /**
@@ -595,7 +597,7 @@ public interface RefreshLayout {
      * 显示刷新动画并且触发刷新事件
      * @param delayed 开始延时
      * @param duration 拖拽动画持续时间
-     * @param dragRate 拉拽的高度比率（要求 ≥ 1 ）
+     * @param dragRate 拉拽的高度比率
      * @param animationOnly animation only 只有动画
      * @return true or false, Status non-compliance will fail.
      *         是否成功（状态不符合会失败）
@@ -632,13 +634,12 @@ public interface RefreshLayout {
      * 显示加载动画, 多功能选项
      * @param delayed 开始延时
      * @param duration 拖拽动画持续时间
-     * @param dragRate 拉拽的高度比率（要求 ≥ 1 ）
+     * @param dragRate 拉拽的高度比率
      * @param animationOnly 是否只是显示动画，不回调
      * @return true or false, Status non-compliance will fail.
      *         是否成功（状态不符合会失败）
      */
     boolean autoLoadMore(int delayed, int duration, float dragRate, boolean animationOnly);
-
 
     /**
      * 是否正在刷新

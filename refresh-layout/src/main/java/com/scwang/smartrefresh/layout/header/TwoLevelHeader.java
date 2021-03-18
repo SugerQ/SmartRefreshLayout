@@ -11,7 +11,7 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 
 /**
  * 二级刷新
- * Created by SCWANG on 2017/5/26.
+ * Created by scwang on 2017/5/26.
  */
 @SuppressWarnings("UnusedReturnValue")
 public class TwoLevelHeader extends com.scwang.smart.refresh.header.TwoLevelHeader implements RefreshHeader {
@@ -25,7 +25,6 @@ public class TwoLevelHeader extends com.scwang.smart.refresh.header.TwoLevelHead
     public TwoLevelHeader(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
-
     //</editor-fold>
 
     public TwoLevelHeader setOnTwoLevelListener(final OnTwoLevelListener listener) {
@@ -51,8 +50,8 @@ public class TwoLevelHeader extends com.scwang.smart.refresh.header.TwoLevelHead
     }
 
     @Override
-    public TwoLevelHeader setMaxRage(float rate) {
-        super.setMaxRage(rate);
+    public TwoLevelHeader setMaxRate(float rate) {
+        super.setMaxRate(rate);
         return this;
     }
 
@@ -63,14 +62,14 @@ public class TwoLevelHeader extends com.scwang.smart.refresh.header.TwoLevelHead
     }
 
     @Override
-    public TwoLevelHeader setFloorRage(float rate) {
-        super.setFloorRage(rate);
+    public TwoLevelHeader setFloorRate(float rate) {
+        super.setFloorRate(rate);
         return this;
     }
 
     @Override
-    public TwoLevelHeader setRefreshRage(float rate) {
-        super.setRefreshRage(rate);
+    public TwoLevelHeader setRefreshRate(float rate) {
+        super.setRefreshRate(rate);
         return this;
     }
 
